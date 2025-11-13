@@ -5,7 +5,9 @@ import Link from 'next/link';
 export default function Header() {
   return (
     <header className="flex justify-between items-center p-6 bg-white text-black shadow-md">
-      <h1 className="text-3xl font-bold tracking-tight font-sans">Шар ном</h1>
+      <Link href="/">
+        <h1 className="text-3xl font-bold tracking-tight font-sans">Шар ном</h1>
+      </Link>
 
       <div className="flex items-center gap-4">
         <Link href="/upload-page">
