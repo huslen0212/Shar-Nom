@@ -21,13 +21,17 @@ async function PlacesSection() {
 
 export default async function Page() {
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="min-h-screen bg-white text-black pb-5">
       <Header />
 
       <div>
         <Link href="/yellow-book/search">
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-6 gap-5">
             <Button>Хайтл хийх</Button>
+
+            <Link href="/all-places">
+              <Button>Бүгдийг үзэх</Button>
+            </Link>
           </div>
         </Link>
       </div>
@@ -35,12 +39,6 @@ export default async function Page() {
       <Suspense fallback={<p className="text-center mt-10">Ачаалж байна...</p>}>
         <PlacesSection />
       </Suspense>
-
-      <div className="flex justify-center mt-6 pb-10">
-        <Link href="/all-places">
-          <Button>Бүгдийг үзэх</Button>
-        </Link>
-      </div>
     </div>
   );
 }
