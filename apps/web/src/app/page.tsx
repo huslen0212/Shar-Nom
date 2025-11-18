@@ -24,6 +24,14 @@ export default async function Page() {
     <div className="min-h-screen bg-white text-black">
       <Header />
 
+      <div>
+        <Link href="/yellow-book/search">
+          <div className="flex justify-center mt-6">
+            <Button>Хайтл хийх</Button>
+          </div>
+        </Link>
+      </div>
+
       <Suspense fallback={<p className="text-center mt-10">Ачаалж байна...</p>}>
         <PlacesSection />
       </Suspense>
