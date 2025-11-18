@@ -24,15 +24,13 @@ export default async function Page() {
     <div className="min-h-screen bg-white text-black pb-5">
       <Header />
 
-      <div>
+      <div className="flex items-center justify-center gap-6 mt-8">
         <Link href="/yellow-book/search">
-          <div className="flex justify-center mt-6 gap-5">
-            <Button>Хайтл хийх</Button>
+          <Button>Хайлт хийх</Button>
+        </Link>
 
-            <Link href="/all-places">
-              <Button>Бүгдийг үзэх</Button>
-            </Link>
-          </div>
+        <Link href="/all-places">
+          <Button>Бүгдийг үзэх</Button>
         </Link>
       </div>
 
