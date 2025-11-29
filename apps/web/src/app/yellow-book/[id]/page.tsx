@@ -23,32 +23,15 @@ interface PageProps {
   params: { id: string };
 }
 
-// 100% STATIC PAGE + ISR (revalidate)
-export const dynamic = 'force-static';
-
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 // 7 хоног = 604800 секунд
 const REVALIDATE_7_DAYS = 604800;
-
-export async function generateStaticParams(): Promise<{ id: string }[]> {
-  const ids = await getTopListingIds();
-  return ids.map((id) => ({ id }));
-}
-
-async function getTopListingIds(): Promise<string[]> {
-  const res = await fetch(process.env.API || 'http://localhost:3001/places', {
-    next: { revalidate: REVALIDATE_7_DAYS },
-  });
-
-  if (!res.ok) return [];
-
-  const places: Place[] = await res.json();
-  return places.map((p) => String(p.id));
-}
 
 export default async function YellowBookPage({ params }: PageProps) {
   const { id } = params;
 
-  const res = await fetch(`http://localhost:3001/places/${id}`, {
+  const res = await fetch(`${process.env.API_URL}/places/${id}`, {
     next: { revalidate: REVALIDATE_7_DAYS },
   });
 
