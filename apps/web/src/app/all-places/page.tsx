@@ -18,17 +18,20 @@ export interface Place {
   long_description: string;
 }
 
-// ISR тохиргоо
-export const revalidate = 60;
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 
-// Streamed section
 async function PlacesSection() {
-  const res = await fetch('http://localhost:3001/places', {
-    next: { revalidate: 60 },
+  const res = await fetch(`${process.env.API_URL}/places`, {
+    cache: 'no-store',
   });
+
+  if (!res.ok) {
+    return <p className="text-center mt-10 text-red-500">Алдаа гарлаа...</p>;
+  }
+
   const places: Place[] = await res.json();
 
-  // Mongol tsagaan tolgoi daraallar sort hiine
   const sortedPlaces = places.sort((a, b) =>
     a.name.localeCompare(b.name, 'mn', { sensitivity: 'base' })
   );
@@ -36,7 +39,7 @@ async function PlacesSection() {
   return <PlacesGrid places={sortedPlaces} />;
 }
 
-export default function Home() {
+export default function AllPlacesPage() {
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
       <Header />
