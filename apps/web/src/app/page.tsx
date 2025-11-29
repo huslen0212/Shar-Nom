@@ -4,17 +4,15 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import PlacesGrid from '@/components/PlacesGrid';
 
-// ISR tohirgoo
 export const revalidate = 60;
 
-// Streamed section
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 async function PlacesSection() {
-  const listings = await fetch(
-    process.env.API || 'http://localhost:3001/places',
-    {
-      next: { revalidate: 60 },
-    }
-  ).then((r) => r.json());
+  const listings = await fetch(`${process.env.API_URL}/places`, {
+    cache: 'no-store',
+  }).then((r) => r.json());
 
   return <PlacesGrid places={listings} />;
 }
