@@ -29,9 +29,9 @@ export default async function Page() {
           <Button>Хайлт хийх</Button>
         </Link>
 
-        <Link href="/all-places">
+        {/* <Link href="/all-places">
           <Button>Бүгдийг үзэх</Button>
-        </Link>
+        </Link> */}
       </div>
 
       <Suspense fallback={<p className="text-center mt-10">Ачаалж байна...</p>}>
