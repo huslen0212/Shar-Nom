@@ -6,7 +6,7 @@ import BackButton from '@/components/BackButton';
 export interface Place {
   id: string;
   name: string;
-  image: string;
+  image_url: string;
   founded_year: string;
   location: string;
   short_description: string;
