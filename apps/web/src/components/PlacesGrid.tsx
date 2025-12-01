@@ -6,7 +6,7 @@ export interface Place {
   id: string;
   name: string;
   short_description: string;
-  image: string;
+  image_url: string;
   location: string;
 }
 
@@ -30,11 +30,11 @@ export default function PlacesGrid({ places }: PlacesGridProps) {
             "
           >
             <div className="relative w-full aspect-[4/3] overflow-hidden rounded-t-2xl">
-              <Image
-                src={place.image || '/default.jpg'}
+              <img
+                src={place.image_url || '/default.jpg'}
                 alt={place.name}
-                fill
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                className="w-full h-full object-cover object-center 
+               transition-transform duration-500 ease-out group-hover:scale-105"
               />
             </div>
 

@@ -9,8 +9,10 @@ export const revalidate = 60;
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
+const apiUrl = process.env.API || 'http://localhost:3001';
+
 async function PlacesSection() {
-  const listings = await fetch(`${process.env.API_URL}/places`, {
+  const listings = await fetch(`${apiUrl}/places`, {
     cache: 'no-store',
   }).then((r) => r.json());
 

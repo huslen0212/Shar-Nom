@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 interface Place {
   id: string;
   name: string;
-  image: string;
+  image_url: string;
   short_description: string;
   location: string;
   category: string;

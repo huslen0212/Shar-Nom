@@ -9,7 +9,7 @@ interface Place {
   id: string;
   name: string;
   long_description: string;
-  image: string;
+  image_url: string;
   founded_year: string;
   location: string;
   category: string;
@@ -28,10 +28,12 @@ export const fetchCache = 'force-no-store';
 // 7 хоног = 604800 секунд
 const REVALIDATE_7_DAYS = 604800;
 
+const apiUrl = process.env.API || 'http://localhost:3001';
+
 export default async function YellowBookPage({ params }: PageProps) {
   const { id } = params;
 
-  const res = await fetch(`${process.env.API_URL}/places/${id}`, {
+  const res = await fetch(`${apiUrl}/places/${id}`, {
     next: { revalidate: REVALIDATE_7_DAYS },
   });
 
@@ -54,7 +56,7 @@ export default async function YellowBookPage({ params }: PageProps) {
           {/* Image */}
           <div className="relative w-full md:w-1/3 h-64">
             <Image
-              src={place.image || '/default.jpg'}
+              src={place.image_url || '/default.jpg'}
               alt={place.name}
               fill
               className="rounded-md object-cover"
