@@ -21,8 +21,10 @@ export interface Place {
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
+const apiUrl = process.env.API || 'http://localhost:3001';
+
 async function PlacesSection() {
-  const res = await fetch(`${process.env.API_URL}/places`, {
+  const res = await fetch(`${apiUrl}/places`, {
     cache: 'no-store',
   });
 
