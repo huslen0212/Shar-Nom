@@ -1,4 +1,5 @@
 import './global.css';
+import { Providers } from './providers';
 
 export const metadata = {
   title: 'Шар Ном',
@@ -32,7 +33,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="mn">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

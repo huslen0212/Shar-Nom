@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import Header from '@/components/Header';
+import HeaderClient from '@/components/HeaderClient';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import PlacesGrid from '@/components/PlacesGrid';
@@ -22,7 +22,7 @@ async function PlacesSection() {
 export default async function Page() {
   return (
     <div className="min-h-screen bg-white text-black pb-5">
-      <Header />
+      <HeaderClient />
 
       <div className="flex items-center justify-center gap-6 mt-8">
         <Link href="/yellow-book/search">

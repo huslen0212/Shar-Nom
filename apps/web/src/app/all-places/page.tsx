@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import Header from '@/components/Header';
+import HeaderClient from '@/components/HeaderClient';
 import PlacesGrid from '@/components/PlacesGrid';
 import BackButton from '@/components/BackButton';
 
@@ -42,7 +42,7 @@ async function PlacesSection() {
 export default function AllPlacesPage() {
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
-      <Header />
+      <HeaderClient />
 
       <div className="px-6 md:px-12 mt-4">
         <BackButton />

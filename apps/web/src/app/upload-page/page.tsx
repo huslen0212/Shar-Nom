@@ -1,4 +1,4 @@
-import Header from '@/components/Header';
+import HeaderClient from '@/components/HeaderClient';
 import BackButton from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +42,7 @@ async function submitYellowBook(formData: FormData) {
 export default function UploadPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <HeaderClient />
 
       <div className="ml-5 mt-4">
         <BackButton />

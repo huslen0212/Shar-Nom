@@ -27,3 +27,9 @@ model place {
   website_url       String?
   category          String?
 }
+
+model user {
+  id String @id @default(cuid())
+  email String @unique
+  role String @default("user") // "user" / "admin"
+}

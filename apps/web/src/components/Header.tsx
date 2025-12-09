@@ -20,10 +20,12 @@ export default function Header() {
           </Button>
         </Link>
 
-        <Button className="flex items-center gap-2 bg-black text-white hover:bg-white hover:text-black border border-black transition">
-          <User className="w-5 h-5" />
-          <span>Нэвтрэх</span>
-        </Button>
+        <Link href="/login">
+          <Button className="flex items-center gap-2 bg-black text-white hover:bg-white hover:text-black border border-black transition">
+            <User className="w-5 h-5" />
+            <span>Нэвтрэх</span>
+          </Button>
+        </Link>
       </div>
     </header>
   );

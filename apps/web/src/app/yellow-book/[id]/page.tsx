@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import Header from '@/components/Header';
+import HeaderClient from '@/components/HeaderClient';
 import BackButton from '@/components/BackButton';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -45,7 +45,7 @@ export default async function YellowBookPage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <HeaderClient />
 
       <div className="ml-5 mt-4">
         <BackButton />

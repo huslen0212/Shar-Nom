@@ -1,7 +1,7 @@
 import FiltersClient from '@/components/FiltersClient';
 import ResultsServer from '@/components/ResultsServer';
 import MapIsland from '@/components/MapIsland';
-import Header from '@/components/Header';
+import HeaderClient from '@/components/HeaderClient';
 
 interface Place {
   id: string;
@@ -71,7 +71,7 @@ export default async function Search({
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+      <HeaderClient />
 
       <div className="mt-6">
         <FiltersClient initial={searchParams} />
