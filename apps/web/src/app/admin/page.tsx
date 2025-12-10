@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import type { user as User, place as Place } from '@prisma/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -22,13 +23,13 @@ export default async function AdminPage() {
   ]);
 
   // Fetch recent users
-  const recentUsers = await prisma.user.findMany({
+  const recentUsers: User[] = await prisma.user.findMany({
     orderBy: { id: 'desc' },
     take: 5,
   });
 
   // Fetch recent places
-  const recentPlaces = await prisma.place.findMany({
+  const recentPlaces: Place[] = await prisma.place.findMany({
     orderBy: { id: 'desc' },
     take: 5,
   });
