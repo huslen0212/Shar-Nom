@@ -8,9 +8,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function Login() {
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
 
-  const handleEmailSignIn = () => {
-    signIn('email', { email });
+  const handleEmail = async () => {
+    setError('');
+
+    const res = await fetch('/api/check-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await res.json();
+
+    if (data.status === 'no_account') {
+      setError('Бүртгэлгүй имэйл байна.');
+      return;
+    }
+
+    if (data.role === 'admin') {
+      signIn('github', { callbackUrl: '/admin' });
+      return;
+    }
+
+    signIn('github', { callbackUrl: '/' });
   };
 
   return (
@@ -23,25 +44,23 @@ export default function Login() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Email Input */}
-          <div className="space-y-2">
-            <Input
-              type="email"
-              placeholder="Цахим шуудан"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          {error && <p className="text-red-500 text-center">{error}</p>}
 
-            <Button className="w-full" onClick={handleEmailSignIn}>
-              Цахим шуудангаар нэвтрэх
-            </Button>
-          </div>
+          <Input
+            type="email"
+            placeholder="Цахим шуудан"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <Button className="w-full" onClick={handleEmail}>
+            Цахим шуудангаар нэвтрэх
+          </Button>
 
           <div className="flex items-center justify-center">
             <span className="text-sm text-gray-400">эсвэл</span>
           </div>
 
-          {/* GitHub Login */}
           <Button
             variant="outline"
             className="w-full"
