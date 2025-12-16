@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
-type UserRecord = { id: string; email: string | null; role: string | null };
+import SignOutButton from '@/components/SignOutButton';
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -44,15 +44,9 @@ export default async function AdminPage() {
           </div>
 
           {/* Баруун талд гарах товч */}
-          <form action="/api/auth/signout" method="post" className="ml-4">
-            <input type="hidden" name="callbackUrl" value="/" />
-            <button
-              type="submit"
-              className="px-3 py-1 rounded bg-white border text-sm hover:bg-gray-100"
-            >
-              Гарах
-            </button>
-          </form>
+          <div>
+            <SignOutButton />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -116,7 +110,7 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentUsers.map((user: UserRecord) => (
+                    {recentUsers.map((user) => (
                       <tr key={user.id} className="border-b hover:bg-gray-50">
                         <td className="py-2 px-2">{user.email}</td>
                         <td className="py-2 px-2">
