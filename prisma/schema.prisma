@@ -26,6 +26,7 @@ model place {
   instagram_url     String?
   website_url       String?
   category          String?
+  timetable         String?
 }
 
 model user {

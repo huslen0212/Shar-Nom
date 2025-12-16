@@ -12,6 +12,19 @@ CREATE TABLE "place" (
     "instagram_url" TEXT,
     "website_url" TEXT,
     "category" TEXT,
+    "timetable" TEXT,
 
     CONSTRAINT "place_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateTable
+CREATE TABLE "user" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'user',
+
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");

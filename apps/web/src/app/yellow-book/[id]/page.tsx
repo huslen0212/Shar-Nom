@@ -17,6 +17,7 @@ interface Place {
   facebook_url: string;
   instagram_url: string;
   website_url: string;
+  timetable: string;
 }
 
 interface PageProps {
@@ -109,6 +110,11 @@ export default async function YellowBookPage({ params }: PageProps) {
                   <Link href={place.website_url}>{place.website_url}</Link>
                 </span>
               </div>
+            </div>
+
+            <div className="flex">
+              <span className="font-semibold w-32">Цагийн хуваарь:</span>
+              <span className="text-gray-700">{place.timetable}</span>
             </div>
 
             {/* Comment */}
