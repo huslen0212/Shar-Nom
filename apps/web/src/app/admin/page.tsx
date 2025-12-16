@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import type { user as User, place as Place } from '@prisma/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
+import SignOutButton from '@/components/SignOutButton';
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
@@ -23,13 +23,13 @@ export default async function AdminPage() {
   ]);
 
   // Fetch recent users
-  const recentUsers: User[] = await prisma.user.findMany({
+  const recentUsers = await prisma.user.findMany({
     orderBy: { id: 'desc' },
     take: 5,
   });
 
   // Fetch recent places
-  const recentPlaces: Place[] = await prisma.place.findMany({
+  const recentPlaces = await prisma.place.findMany({
     orderBy: { id: 'desc' },
     take: 5,
   });
@@ -37,12 +37,18 @@ export default async function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 text-black">
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Систем удирдлагын хэсэг</p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-gray-600">Систем удирдлагын хэсэг</p>
+          </div>
+
+          {/* Баруун талд гарах товч */}
+          <div>
+            <SignOutButton />
+          </div>
         </div>
 
-        {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-2">

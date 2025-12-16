@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
+import type { SignInResponse } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleEmail = async () => {
     setError('');
@@ -26,12 +29,22 @@ export default function Login() {
       return;
     }
 
-    if (data.role === 'admin') {
-      signIn('github', { callbackUrl: '/admin' });
+    const signInResult = (await signIn('credentials', {
+      email,
+      redirect: false,
+    })) as SignInResponse | undefined;
+
+    if (signInResult?.error) {
+      setError('Нэвтрэх үед алдаа гарлаа.');
       return;
     }
 
-    signIn('github', { callbackUrl: '/' });
+    if (data.role === 'admin') {
+      router.push('/admin');
+      return;
+    }
+
+    router.push('/');
   };
 
   return (
