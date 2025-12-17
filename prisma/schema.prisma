@@ -16,6 +16,7 @@ datasource db {
 model place {
   id                Int     @id @default(autoincrement())
   name              String
+  slug              String? @unique
   founded_year      Int?
   image_url         String?
   short_description String?
@@ -27,6 +28,7 @@ model place {
   website_url       String?
   category          String?
   timetable         String?
+  embedding         Json?
 }
 
 model user {

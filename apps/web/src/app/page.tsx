@@ -32,6 +32,10 @@ export default async function Page() {
         <Link href="/all-places">
           <Button>Бүгдийг үзэх</Button>
         </Link>
+
+        <Link href="/yellow-book/assistant">
+          <Button>AI хайлт</Button>
+        </Link>
       </div>
 
       <Suspense fallback={<p className="text-center mt-10">Ачаалж байна...</p>}>

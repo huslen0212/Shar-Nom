@@ -26,11 +26,12 @@ async function main() {
       instagram_url: "https://www.facebook.com/National.Library.of.Mongolia",
       website_url: "https://www.facebook.com/National.Library.of.Mongolia",
       category: "Номын сан",
+      timetable: "07:00-20:00",
     },
     {
       name: "Гандантэгчэнлин хийд",
       founded_year: 1835,
-      image_url: "https://example.com/https://shar-nom.s3.eu-north-1.amazonaws.com/gandan.jpg.jpg",
+      image_url: "https://shar-nom.s3.eu-north-1.amazonaws.com/gandan.jpg",
       short_description: "Монголын хамгийн том буддын шашны хийд.",
       long_description: "Гандантэгчэнлин хийд нь Монголын хамгийн том, хамгийн чухал буддын шашны хийд юм. Энд олон лам нар амьдардаг бөгөөд оюутан, жуулчдад зориулсан бясалгалын өрөөнүүд байдаг. Хийд нь олон соёлын болон шашны арга хэмжээг тогтмол зохион байгуулагддаг. Мөн сүмийн музей, эртний бурхдын баримлуудтай. Монголын соёл, түүхийг ойлгоход чухал төв юм.",
       location: "Улаанбаатар, Чингэлтэй дүүрэг",
@@ -39,11 +40,12 @@ async function main() {
       instagram_url: "https://www.facebook.com/National.Library.of.Mongolia",
       website_url: "https://www.facebook.com/National.Library.of.Mongolia",
       category: "Музей/Шашны газар",
+      timetable: "09:00-18:00",
     },
     {
       name: "Богд хааны ордон музей",
       founded_year: 1893,
-      image_url: "https://example.com/https://shar-nom.s3.eu-north-1.amazonaws.com/bogdMuzei.jpg.jpg",
+      image_url: "https://shar-nom.s3.eu-north-1.amazonaws.com/bogdMuzei.jpg",
       short_description: "Түүхэн дурсгалт байр, музей болжээ.",
       long_description: "Богд хааны ордон нь түүхэн дурсгалт байр бөгөөд Богд хааны гэр байсан. Одоо музей болж Монголын түүх, соёлын өвийг дэлгэн үзүүлдэг. Музейд хувцас, эд хэрэгсэл, уран зураг, гэрэлт хөшөө зэрэг үзмэрүүд бий. Жуулчид болон судлаачид Монголын хаадын түүхийг танин мэдэх боломжтой. Мөн ордны гоёл чимэглэл, архитектурыг сонирхох боломжтой.",
       location: "Улаанбаатар, Баянзүрх дүүрэг",
@@ -52,11 +54,12 @@ async function main() {
       instagram_url: "https://www.facebook.com/National.Library.of.Mongolia",
       website_url: "https://www.facebook.com/National.Library.of.Mongolia",
       category: "Музей",
+      timetable: "09:00-19:00",
     },
     {
       name: "Сүхбаатарын талбай",
       founded_year: 1946,
-      image_url: "https://example.com/https://shar-nom.s3.eu-north-1.amazonaws.com/suhbaatar.jpg.jpg",
+      image_url: "https://shar-nom.s3.eu-north-1.amazonaws.com/suhbaatar.jpg",
       short_description: "Улаанбаатарын төв талбай.",
       long_description: "Сүхбаатарын талбай нь Улаанбаатарын төвд байрлах алдартай талбай юм. Энд төрийн барилга, хөшөө, дурсгалууд байдаг. Талбай нь олон нийтийн арга хэмжээ, тэмдэглэлт үйл явдлуудыг зохион байгуулахад тохиромжтой. Жуулчид болон оршин суугчид амралт, зураг авахад их ирдэг. Мөн нээлттэй орчин нь хотын амьдралын төв болсон газар юм.",
       location: "Улаанбаатар, Сүхбаатар дүүрэг",
@@ -65,11 +68,12 @@ async function main() {
       instagram_url: "https://www.facebook.com/National.Library.of.Mongolia",
       website_url: "https://www.facebook.com/National.Library.of.Mongolia",
       category: "Талбай/Дурсгалт газар",
+      timetable: "00:00-00:00",
     },
     {
       name: "Монголын Үндэсний музей",
       founded_year: 1924,
-      image_url: "https://example.com/https://shar-nom.s3.eu-north-1.amazonaws.com/cingisMuzei.jpg.jpg",
+      image_url: "https://shar-nom.s3.eu-north-1.amazonaws.com/cingisMuzei.jpg",
       short_description: "Монголын түүх, соёлын өвийг дэлгэн үзүүлдэг музей.",
       long_description: "Монголын Үндэсний музей нь Монголын түүх, соёлын өвийг дэлгэн үзүүлдэг том музей юм. Музейд эртний олдвор, уламжлалт хувцас, гар урлал, археологийн эд зүйлс хадгалагдсан. Судлаачид болон жуулчдад зориулсан үзэсгэлэн, сургалт, лекцүүдийг тогтмол зохион байгуулдаг. Мөн Монголын төр, нийгмийн хөгжил, түүхийн чухал үйл явдлуудыг харуулсан үзмэрүүдтэй. Орчин үеийн технологи ашиглан мультимедиа дэлгэц, гарын авлагаар үзэгчдэд мэдээлэл өгдөг.",
       location: "Улаанбаатар, Сүхбаатар дүүрэг",
@@ -78,11 +82,12 @@ async function main() {
       instagram_url: "https://www.facebook.com/National.Library.of.Mongolia",
       website_url: "https://www.facebook.com/National.Library.of.Mongolia",
       category: "Музей",
+      timetable: "08:00-18:00",
     },
       {
     name: "Tom N Toms Coffee",
     founded_year: 2011,
-    image_url: "https://shar-nom.s3.eu-north-1.amazonaws.com/images.jpg", // чи өөрөө тавина
+    image_url: "https://shar-nom.s3.eu-north-1.amazonaws.com/images.jpg",
     short_description: "Олон улсын сүлжээ кофе шоп.",
     long_description:
       "Tom N Toms Coffee нь Өмнөд Солонгосоос гаралтай олон улсын кофе шопын сүлжээ бөгөөд Улаанбаатар хотод хэд хэдэн салбартай. Энд төрөл бүрийн кофе, цай, амттан, хөнгөн зуушаар үйлчилдэг. Чимээгүй орчин нь уулзалт, ажил хийх, амрахад тохиромжтой.",
@@ -92,6 +97,7 @@ async function main() {
     instagram_url: "https://www.instagram.com/tomntomsmongolia",
     website_url: "",
     category: "Кофе шоп",
+    timetable: "07:00-22:00",
   },
   {
     name: "The Bull Hot Pot Restaurant",
@@ -106,6 +112,7 @@ async function main() {
     instagram_url: "",
     website_url: "",
     category: "Ресторан",
+    timetable: "09:00-23:00",
   },
   {
     name: "Pizza Hut Mongolia",
@@ -120,6 +127,7 @@ async function main() {
     instagram_url: "https://www.instagram.com/pizzahutmongolia",
     website_url: "",
     category: "Ресторан",
+    timetable: "08:00-22:00",
   },
   {
     name: "Playtime Game Center",
@@ -134,6 +142,7 @@ async function main() {
     instagram_url: "",
     website_url: "",
     category: "Тоглоомын төв",
+    timetable: "10:00-20:00",
   },
   {
     name: "Sky Resort",
@@ -148,6 +157,7 @@ async function main() {
     instagram_url: "",
     website_url: "https://www.skyresort.mn",
     category: "Амралт/Зугаа цэнгэл",
+    timetable: "07:00-00:00",
   },
   ];
 
