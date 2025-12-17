@@ -1,24 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
+import Link from 'next/link';
 import HeaderClient from '@/components/HeaderClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
+interface Place {
+  id: string | number;
+  name: string;
+  location?: string;
+  category?: string;
+}
+
 export default function AssistantPage() {
   const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [places, setPlaces] = useState<any[]>([]);
+  const [sources, setSources] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const handleSearch = async (e?: FormEvent) => {
+    if (e) e.preventDefault();
     if (!question.trim()) return;
 
     setLoading(true);
-    setAnswer('');
-    setPlaces([]);
+    setSources([]);
 
     try {
       const res = await fetch(
@@ -30,71 +36,61 @@ export default function AssistantPage() {
         }
       );
 
+      if (!res.ok) throw new Error('Network error');
       const data = await res.json();
-      setAnswer(data.answer);
-      setPlaces(data.places || []);
+
+      setSources(data.sources || []);
     } catch (err) {
-      setAnswer('Алдаа гарлаа. Дахин оролдоно уу.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <HeaderClient />
-
       <div className="max-w-3xl mx-auto p-6 space-y-6">
-        {/* Search box */}
         <Card className="shadow-md">
           <CardHeader>
             <CardTitle className="text-xl">🤖 AI Туслах (Шар ном)</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={onSubmit} className="flex gap-2">
+            <form onSubmit={handleSearch} className="flex gap-2">
               <Input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Жишээ: Оюутанд зориулсан номын сан хаана байна вэ?"
+                placeholder="Жишээ: Сүхбаатар дүүрэгт кофе шоп хаана байна?"
               />
               <Button type="submit" disabled={loading}>
-                {loading ? 'Хайж байна…' : 'Асуух'}
+                {loading ? 'Хайж байна…' : 'Хайх'}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Answer */}
-        {answer && (
-          <Card className="bg-white border-l-4 border-black">
-            <CardContent className="p-4 text-gray-800">{answer}</CardContent>
-          </Card>
-        )}
-
-        {/* Places */}
-        {places.length > 0 && (
+        {sources.length > 0 && (
           <div className="grid sm:grid-cols-2 gap-4">
-            {places.map((p) => (
-              <Card key={p.id} className="hover:shadow-lg transition">
-                <CardContent className="p-4 space-y-1">
-                  <h3 className="font-semibold text-lg">{p.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    📍 {p.location || 'Байршил тодорхойгүй'}
-                  </p>
-                  <span className="inline-block text-xs bg-gray-200 px-2 py-1 rounded">
-                    {p.category}
-                  </span>
-                </CardContent>
-              </Card>
+            {sources.map((p) => (
+              <Link key={p.id} href={`/yellow-book/${p.id}`}>
+                <Card className="hover:shadow-lg transition cursor-pointer h-full border hover:border-black group">
+                  <CardContent className="p-4 space-y-1">
+                    <h3 className="font-semibold text-lg group-hover:text-blue-600 transition">
+                      {p.name}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      📍 {p.location || 'Байршил тодорхойгүй'}
+                    </p>
+                    {p.category && (
+                      <span className="inline-block text-xs bg-gray-200 px-2 py-1 rounded">
+                        {p.category}
+                      </span>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
-        )}
-
-        {/* Empty state */}
-        {!loading && !answer && places.length === 0 && (
-          <p className="text-center text-gray-400">
-            Асууулт бичээд AI-гаас зөвлөгөө аваарай 🙂
-          </p>
         )}
       </div>
     </div>
