@@ -3,7 +3,6 @@
   "compilerOptions": {
     "jsx": "preserve",
     "noEmit": true,
-    "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "lib": [
@@ -25,13 +24,9 @@
         "./src/*"
       ]
     },
-    "outDir": "dist",
-    "rootDir": "src",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "rootDir": "src"
   },
   "include": [
-    "../../apps/web/.next/types/**/*.ts",
-    "../../dist/apps/web/.next/types/**/*.ts",
     "next-env.d.ts",
     "src/**/*.js",
     "src/**/*.jsx",
@@ -40,16 +35,13 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "out-tsc",
-    "dist",
     "node_modules",
-    "jest.config.ts",
-    "jest.config.cts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
+    "dist",
     ".next",
-    "eslint.config.js",
-    "eslint.config.cjs",
-    "eslint.config.mjs"
+    "out-tsc",
+    "jest.config.*",
+    "eslint.config.*",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
   ]
 }
