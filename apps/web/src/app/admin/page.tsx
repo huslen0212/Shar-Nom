@@ -4,6 +4,8 @@ import { getServerSession, Session } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import SignOutButton from '@/components/SignOutButton';
+// Prisma-ийн төрлүүдийг импортлох
+import { user, place } from '@prisma/client';
 
 interface AdminSession extends Session {
   user: {
@@ -32,11 +34,13 @@ export default async function AdminPage() {
     prisma.user.count({ where: { role: 'admin' } }),
   ]);
 
-  const recentUsers = await prisma.user.findMany({
+  // Төрлийг зааж өгөх (User[])
+  const recentUsers: user[] = await prisma.user.findMany({
     orderBy: { id: 'desc' },
   });
 
-  const recentPlaces = await prisma.place.findMany({
+  // Төрлийг зааж өгөх (Place[])
+  const recentPlaces: place[] = await prisma.place.findMany({
     orderBy: { id: 'desc' },
   });
 
@@ -115,7 +119,8 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentUsers.map((user) => (
+                    {/* User төрлийг энд тодорхой зааж өгсөн */}
+                    {recentUsers.map((user: user) => (
                       <tr key={user.id} className="border-b hover:bg-gray-50">
                         <td className="py-2 px-2">{user.email}</td>
                         <td className="py-2 px-2">
@@ -161,7 +166,8 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentPlaces.map((place) => (
+                    {/* Place төрлийг энд тодорхой зааж өгсөн */}
+                    {recentPlaces.map((place: place) => (
                       <tr key={place.id} className="border-b hover:bg-gray-50">
                         <td className="py-2 px-2 font-medium">{place.name}</td>
                         <td className="py-2 px-2">{place.category || '-'}</td>
