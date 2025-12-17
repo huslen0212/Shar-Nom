@@ -4,16 +4,28 @@ import cors from 'cors';
 import { Groq } from 'groq-sdk';
 import Redis from 'ioredis';
 
-// --- Төрлүүдийн тодорхойлолт ---
+interface Place {
+  id: number;
+  name: string;
+  category?: string | null;
+  location?: string | null;
+  embedding?: number[];
+  long_description?: string | null;
+  founded_year?: number | null;
+}
+
+interface ScoredPlace extends Place {
+  finalScore: number;
+}
+
 interface TransformerModule {
-  pipeline: (task: string, model: string) => Promise<any>;
+  pipeline: (task: string, model: string) => Promise<(text: string, options?: object) => Promise<{ data: number[] | Float32Array }>>;
 }
 
 const app = express();
 const prisma = new PrismaClient();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// Алдаа 1: Redis-ийг ашиглахгүй бол comment болгох эсвэл хайлтад ашиглах
 const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: Number(process.env.REDIS_PORT) || 6379,
@@ -25,11 +37,10 @@ const redis = new Redis({
 app.use(cors());
 app.use(express.json());
 
-// GET /places — buh gazruudiig avah
 app.get('/places', async (_req: Request, res: Response) => {
   try {
     const places = await prisma.place.findMany(); 
-    return res.json(places); // return нэмэв
+    return res.json(places);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Өгөгдөл татахад алдаа гарлаа.' });
@@ -70,43 +81,34 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
     const cached = await redis.get(cacheKey);
     if (cached) return res.json(JSON.parse(cached));
 
-    // 1. Асуултыг вектор болгох
-    const { pipeline } = await (eval('import("@xenova/transformers")') as Promise<TransformerModule>);
-    const embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    // Dynamic import-ыг төрөлтэй болгов
+    const transformers = await (import('@xenova/transformers') as unknown as Promise<TransformerModule>);
+    const embedder = await transformers.pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
     const output = await embedder(question, { pooling: 'mean', normalize: true });
     const questionVector = Array.from(output.data) as number[];
 
     const lowerQuestion = question.toLowerCase();
-
-    // 2. Хэрэглэгчийн хүсэлтээс ангиллыг таних (Музей, Ресторан гэх мэт)
-    // Энэ хэсэг нь зураг дээрх шиг холимог үр дүн гарахаас сэргийлнэ.
     const categories = ['музей', 'ресторан', 'кофе', 'зочид буудал', 'эмнэлэг', 'сургууль', 'тоглоомын төв'];
     const detectedCategory = categories.find(cat => lowerQuestion.includes(cat));
 
-    // 3. Өгөгдөл татах (Бүх өгөгдлийг биш, хэрэгцээтэйг нь шүүх)
     const allPlaces = await prisma.place.findMany({
       where: { 
         NOT: { embedding: { equals: [] } } 
       }
-    });
+    }) as Place[];
 
-    // 4. Scoring (Оноо өгөх логикийг чангатгах)
-    const scoredPlaces = allPlaces.map((p) => {
+    // 4. Scoring (Төрлийг зааж өгөв)
+    const scoredPlaces: ScoredPlace[] = allPlaces.map((p: Place) => {
       let score = cosineSimilarity(questionVector, p.embedding as number[]);
       const pName = p.name.toLowerCase();
       const pCat = (p.category || '').toLowerCase();
       const pLoc = (p.location || '').toLowerCase();
 
-      // А. Ангиллын тааралтыг маш өндөр оноогоор шагнах (Хамгийн чухал засалт)
       if (detectedCategory && pCat.includes(detectedCategory)) {
-        score += 0.5; // Ангилал таарвал жагсаалтын эхэнд гаргана
+        score += 0.5;
       }
-
-      // Б. Нэр болон байршлын оноо
       if (lowerQuestion.includes(pName)) score += 0.3;
       if (lowerQuestion.includes(pLoc)) score += 0.2;
-
-      // В. Хэрэв хэрэглэгч "Музей" гэсэн боловч энэ нь "Ресторан" бол оноог хасах (Penalty)
       if (detectedCategory && !pCat.includes(detectedCategory)) {
         score -= 0.2; 
       }
@@ -114,15 +116,14 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
       return { ...p, finalScore: score };
     });
 
-    // 5. Босго оноо тогтоох (Маш бага оноотой үр дүнг хасах)
+    // 5. Filter & Sort (Төрлийг зааж өгөв)
     const topPlaces = scoredPlaces
-      .filter(p => p.finalScore > 0.3) // 0.3-аас бага оноотой бол хамааралгүй гэж үзнэ
-      .sort((a, b) => b.finalScore - a.finalScore)
+      .filter((p: ScoredPlace) => p.finalScore > 0.3)
+      .sort((a: ScoredPlace, b: ScoredPlace) => b.finalScore - a.finalScore)
       .slice(0, 4);
 
-    // 6. LLM-д "хатуу" заавар өгөх
     const context = topPlaces.length > 0 
-      ? topPlaces.map(p => `- ${p.name} (${p.category}): ${p.long_description || 'Тайлбаргүй'}`).join('\n')
+      ? topPlaces.map((p: ScoredPlace) => `- ${p.name} (${p.category}): ${p.long_description || 'Тайлбаргүй'}`).join('\n')
       : "Хэрэглэгчийн хүсэлтэд тохирох газар олдсонгүй.";
 
     const chatCompletion = await groq.chat.completions.create({
@@ -131,8 +132,7 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
           role: 'system',
           content: `Чи бол "Шар ном" лавлахын туслах. 
           Дүрэм 1: Зөвхөн өгөгдсөн context доторх газруудыг санал болго. 
-          Дүрэм 2: Хэрэв context хоосон бол "Уучлаарай, таны хайсан ангилалд тохирох газар олдсонгүй" гэж хариул.
-          Дүрэм 3: Хамааралгүй (жишээ нь музей хайхад ресторан) газар БҮҮ санал болго.`
+          Дүрэм 2: Хэрэв context хоосон бол "Уучлаарай, таны хайсан ангилалд тохирох газар олдсонгүй" гэж хариул.`
         },
         { role: 'user', content: `Асуулт: ${question}\n\nБоломжит газрууд:\n${context}` }
       ],
@@ -141,7 +141,7 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
 
     const result = { 
       answer: chatCompletion.choices[0]?.message?.content, 
-      sources: topPlaces.map(p => ({ id: p.id, name: p.name, location: p.location, category: p.category }))
+      sources: topPlaces.map((p: ScoredPlace) => ({ id: p.id, name: p.name, location: p.location, category: p.category }))
     };
 
     await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600);
