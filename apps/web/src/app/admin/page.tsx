@@ -31,7 +31,6 @@ export default async function AdminPage() {
             <p className="text-gray-600">Систем удирдлагын хэсэг</p>
           </div>
 
-          {/* Баруун талд гарах товч */}
           <div>
             <SignOutButton />
           </div>
