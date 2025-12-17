@@ -1,9 +1,22 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/lib/prisma";
-import { Session } from "next-auth";
-import { User } from "next-auth";
+import { PrismaClient } from "@prisma/client";
+import type { Session, User } from "next-auth";
+
+const globalForPrisma = global as unknown as {
+  prisma?: PrismaClient;
+};
+
+const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: ["error"],
+  });
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,13 +26,21 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
       },
       async authorize(credentials) {
-        const email = credentials?.email;
+        const email = credentials?.email?.toLowerCase().trim();
         if (!email) return null;
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({
+          where: { email },
+        });
+
         if (!user) return null;
 
-        return { id: user.id, email: user.email, name: user.email, role: user.role } as User;
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.email,
+          role: user.role,
+        } as User;
       },
     }),
 
@@ -40,10 +61,13 @@ export const authOptions: NextAuthOptions = {
       await prisma.user.upsert({
         where: { email: user.email },
         update: isAdmin ? { role: "admin" } : {},
-        create: { email: user.email, role: isAdmin ? "admin" : "user" },
+        create: {
+          email: user.email,
+          role: isAdmin ? "admin" : "user",
+        },
       });
 
-      return isAdmin ? '/admin' : true;
+      return isAdmin ? "/admin" : true;
     },
 
     async session({ session }: { session: Session }) {
