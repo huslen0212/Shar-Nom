@@ -4,8 +4,7 @@ import { getServerSession, Session } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import SignOutButton from '@/components/SignOutButton';
-// Prisma-ийн төрлүүдийг импортлох
-import { user as UserType, place as PlaceType } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 interface AdminSession extends Session {
   user: {
@@ -34,13 +33,11 @@ export default async function AdminPage() {
     prisma.user.count({ where: { role: 'admin' } }),
   ]);
 
-  // Төрлийг зааж өгөх (User[])
-  const recentUsers: UserType[] = await prisma.user.findMany({
+  const recentUsers = await prisma.user.findMany({
     orderBy: { id: 'desc' },
   });
 
-  // Төрлийг зааж өгөх (Place[])
-  const recentPlaces: PlaceType[] = await prisma.place.findMany({
+  const recentPlaces = await prisma.place.findMany({
     orderBy: { id: 'desc' },
   });
 
@@ -119,26 +116,28 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* User төрлийг энд тодорхой зааж өгсөн */}
-                    {recentUsers.map((user: UserType) => (
-                      <tr key={user.id} className="border-b hover:bg-gray-50">
-                        <td className="py-2 px-2">{user.email}</td>
-                        <td className="py-2 px-2">
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-semibold ${
-                              user.role === 'admin'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-blue-100 text-blue-800'
-                            }`}
-                          >
-                            {user.role === 'admin' ? 'Админ' : 'Хэрэглэгч'}
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-gray-500 text-xs">
-                          {String(user.id).slice(0, 25)}
-                        </td>
-                      </tr>
-                    ))}
+                    {/* Төрлийг жижиг үсгээр зааж, хоосон объектын оронд Record ашиглав */}
+                    {recentUsers.map(
+                      (user: Prisma.userGetPayload<Record<string, never>>) => (
+                        <tr key={user.id} className="border-b hover:bg-gray-50">
+                          <td className="py-2 px-2">{user.email}</td>
+                          <td className="py-2 px-2">
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                user.role === 'admin'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}
+                            >
+                              {user.role === 'admin' ? 'Админ' : 'Хэрэглэгч'}
+                            </span>
+                          </td>
+                          <td className="py-2 px-2 text-gray-500 text-xs">
+                            {String(user.id).slice(0, 25)}
+                          </td>
+                        </tr>
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -166,19 +165,28 @@ export default async function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Place төрлийг энд тодорхой зааж өгсөн */}
-                    {recentPlaces.map((place: PlaceType) => (
-                      <tr key={place.id} className="border-b hover:bg-gray-50">
-                        <td className="py-2 px-2 font-medium">{place.name}</td>
-                        <td className="py-2 px-2">{place.category || '-'}</td>
-                        <td className="py-2 px-2 text-gray-600">
-                          {place.location || '-'}
-                        </td>
-                        <td className="py-2 px-2 text-gray-500">
-                          {place.founded_year || '-'}
-                        </td>
-                      </tr>
-                    ))}
+                    {/* Төрлийг жижиг үсгээр зааж, хоосон объектын оронд Record ашиглав */}
+                    {recentPlaces.map(
+                      (
+                        place: Prisma.placeGetPayload<Record<string, never>>
+                      ) => (
+                        <tr
+                          key={place.id}
+                          className="border-b hover:bg-gray-50"
+                        >
+                          <td className="py-2 px-2 font-medium">
+                            {place.name}
+                          </td>
+                          <td className="py-2 px-2">{place.category || '-'}</td>
+                          <td className="py-2 px-2 text-gray-600">
+                            {place.location || '-'}
+                          </td>
+                          <td className="py-2 px-2 text-gray-500">
+                            {place.founded_year || '-'}
+                          </td>
+                        </tr>
+                      )
+                    )}
                   </tbody>
                 </table>
               </div>
