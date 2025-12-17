@@ -1,12 +1,22 @@
 import { prisma } from '@/lib/prisma';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getServerSession } from 'next-auth';
+import { getServerSession, Session } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import SignOutButton from '@/components/SignOutButton';
 
+interface AdminSession extends Session {
+  user: {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: string;
+  };
+}
+
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions);
+  const session = (await getServerSession(authOptions)) as AdminSession | null;
 
   if (!session?.user) {
     redirect('/login');
@@ -15,23 +25,19 @@ export default async function AdminPage() {
   if (session.user.role !== 'admin') {
     redirect('/');
   }
-  // Fetch statistics
+
   const [totalUsers, totalPlaces, adminCount] = await Promise.all([
     prisma.user.count(),
     prisma.place.count(),
     prisma.user.count({ where: { role: 'admin' } }),
   ]);
 
-  // Fetch recent users
   const recentUsers = await prisma.user.findMany({
     orderBy: { id: 'desc' },
-    take: 5,
   });
 
-  // Fetch recent places
   const recentPlaces = await prisma.place.findMany({
     orderBy: { id: 'desc' },
-    take: 5,
   });
 
   return (
@@ -42,13 +48,12 @@ export default async function AdminPage() {
             <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
             <p className="text-gray-600">Систем удирдлагын хэсэг</p>
           </div>
-
-          {/* Баруун талд гарах товч */}
           <div>
             <SignOutButton />
           </div>
         </div>
 
+        {/* Статистик картууд */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-2">
@@ -93,7 +98,7 @@ export default async function AdminPage() {
           </Card>
         </div>
 
-        {/* Recent Users */}
+        {/* Сүүлийн хэрэглэгчид */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle>Сүүлийн хэрэглэгчид</CardTitle>
@@ -125,7 +130,7 @@ export default async function AdminPage() {
                           </span>
                         </td>
                         <td className="py-2 px-2 text-gray-500 text-xs">
-                          {user.id.slice(0, 25)}
+                          {String(user.id).slice(0, 25)}
                         </td>
                       </tr>
                     ))}
@@ -138,7 +143,7 @@ export default async function AdminPage() {
           </CardContent>
         </Card>
 
-        {/* Recent Places */}
+        {/* Сүүлийн газрууд */}
         <Card>
           <CardHeader>
             <CardTitle>Сүүлийн газрууд</CardTitle>
@@ -152,7 +157,7 @@ export default async function AdminPage() {
                       <th className="text-left py-2 px-2">Газрын нэр</th>
                       <th className="text-left py-2 px-2">Ангилал</th>
                       <th className="text-left py-2 px-2">Байршил</th>
-                      <th className="text-left py-2 px-2">Үүсгэгдсэн оны</th>
+                      <th className="text-left py-2 px-2">Үүсгэгдсэн он</th>
                     </tr>
                   </thead>
                   <tbody>
