@@ -36,3 +36,19 @@ model user {
   email String @unique
   role String @default("user") // "user" / "admin"
 }
+
+model Job {
+  id          String   @id @default(cuid())
+  type        String
+  payload     Json
+  status      String   @default("pending") // pending | processing | done | failed | dead
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(5)
+  runAt       DateTime @default(now())
+  lastError   String?
+  dedupeKey   String?  @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type, status, runAt])
+}
