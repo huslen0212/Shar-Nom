@@ -7,7 +7,6 @@ import crypto from 'crypto';
 import { enqueueJob } from './queue';
 import './worker';
 
-
 interface Place {
   id: number;
   name: string;
@@ -34,7 +33,6 @@ interface TransformerModule {
   >;
 }
 
-
 const app = express();
 const prisma = new PrismaClient();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -42,9 +40,6 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: Number(process.env.REDIS_PORT) || 6379,
-  retryStrategy(times) {
-    return Math.min(times * 50, 2000);
-  },
 });
 
 app.use(cors());
@@ -59,27 +54,33 @@ function cosineSimilarity(vecA: number[], vecB: number[]) {
   return dot / (magA * magB);
 }
 
-app.post('/users/:id/send-welcome', async (req: Request, res: Response) => {
-  const id = req.params.id;
+app.post('/internal/notify-login', async (req: Request, res: Response) => {
+  const { email } = req.body;
 
-  const user = await prisma.user.findUnique({ where: { id } });
-  if (!user?.email) {
-    return res.status(404).json({ message: 'User not found or no email' });
+  if (!email) {
+    return res.status(400).json({ message: 'Email required' });
   }
+
+  const user = await prisma.user.upsert({
+    where: { email },
+    update: {},
+    create: {
+      email,
+      role: 'user',
+    },
+  });
 
   const payload = {
     to: user.email,
     subject: 'Шар номд тавтай морил',
-    template: 'welcome',
+    template: 'github-login',
     data: {
       name: user.email,
+      provider: 'GitHub',
     },
   };
 
-  const keyBase = `${payload.template}:${payload.to}:${JSON.stringify(
-    payload.data
-  )}`;
-
+  const keyBase = `${payload.template}:${payload.to}`;
   const dedupeKey = `email:${crypto
     .createHash('sha256')
     .update(keyBase)
@@ -91,30 +92,20 @@ app.post('/users/:id/send-welcome', async (req: Request, res: Response) => {
 });
 
 app.get('/places', async (_req: Request, res: Response) => {
-  try {
-    const places = await prisma.place.findMany();
-    return res.json(places);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Өгөгдөл татахад алдаа гарлаа.' });
-  }
+  const places = await prisma.place.findMany();
+  return res.json(places);
 });
 
 app.get('/places/:id', async (req: Request, res: Response) => {
-  try {
-    const place = await prisma.place.findUnique({
-      where: { id: Number(req.params.id) },
-    });
+  const place = await prisma.place.findUnique({
+    where: { id: Number(req.params.id) },
+  });
 
-    if (!place) {
-      return res.status(404).json({ error: 'Place олдсонгүй.' });
-    }
-
-    return res.json(place);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'Өгөгдөл татахад алдаа гарлаа.' });
+  if (!place) {
+    return res.status(404).json({ error: 'Place олдсонгүй.' });
   }
+
+  return res.json(place);
 });
 
 app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
@@ -123,28 +114,26 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Асуулт хоосон байна.' });
   }
 
-  try {
-    const cacheKey = `search:${Buffer.from(question).toString('base64')}`;
-    const cached = await redis.get(cacheKey);
-    if (cached) return res.json(JSON.parse(cached));
+  const cacheKey = `search:${Buffer.from(question).toString('base64')}`;
+  const cached = await redis.get(cacheKey);
+  if (cached) return res.json(JSON.parse(cached));
 
-    const transformers = (await import(
-      '@xenova/transformers'
-    )) as unknown as TransformerModule;
+  const transformers = (await import(
+    '@xenova/transformers'
+  )) as unknown as TransformerModule;
 
-    const embedder = await transformers.pipeline(
-      'feature-extraction',
-      'Xenova/all-MiniLM-L6-v2'
-    );
+  const embedder = await transformers.pipeline(
+    'feature-extraction',
+    'Xenova/all-MiniLM-L6-v2'
+  );
 
-    const output = await embedder(question, {
-      pooling: 'mean',
-      normalize: true,
-    });
+  const output = await embedder(question, {
+    pooling: 'mean',
+    normalize: true,
+  });
 
-    const questionVector = Array.from(output.data) as number[];
-
-    const lowerQuestion = question.toLowerCase();
+  const questionVector = Array.from(output.data) as number[];
+  const lowerQuestion = question.toLowerCase();
     const categories = [
       'музей',
       'ресторан',
@@ -183,12 +172,12 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
       return { ...p, finalScore: score };
     });
 
-    const topPlaces = scored
-      .filter((p) => p.finalScore > 0.3)
-      .sort((a, b) => b.finalScore - a.finalScore)
-      .slice(0, 4);
+  const topPlaces = scored
+    .filter((p) => p.finalScore > 0.3)
+    .sort((a, b) => b.finalScore - a.finalScore)
+    .slice(0, 4);
 
-    const context =
+        const context =
       topPlaces.length > 0
         ? topPlaces
             .map(
@@ -225,18 +214,12 @@ app.post('/api/ai/yellow-books/search', async (req: Request, res: Response) => {
       })),
     };
 
-    await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600);
-    return res.json(result);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: 'AI хайлтад алдаа гарлаа.' });
-  }
+  await redis.set(cacheKey, JSON.stringify(result), 'EX', 3600);
+  return res.json(result);
+  
 });
 
-
-const host = process.env.HOST ?? 'localhost';
 const port = 3001;
-
-app.listen(port, host, () => {
-  console.log(`[ ready ] http://${host}:${port}`);
+app.listen(port, () => {
+  console.log(`[ ready ] http://localhost:${port}`);
 });

@@ -1,8 +1,8 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
-import GithubProvider from "next-auth/providers/github";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
-import type { Session, User } from "next-auth";
+import NextAuth, { NextAuthOptions } from 'next-auth';
+import GithubProvider from 'next-auth/providers/github';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { PrismaClient } from '@prisma/client';
+import type { Session, User } from 'next-auth';
 
 const globalForPrisma = global as unknown as {
   prisma?: PrismaClient;
@@ -11,19 +11,19 @@ const globalForPrisma = global as unknown as {
 const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: ["error"],
+    log: ['error'],
   });
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "Email",
+      name: 'Email',
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: 'Email', type: 'email' },
       },
       async authorize(credentials) {
         const email = credentials?.email?.toLowerCase().trim();
@@ -45,13 +45,13 @@ export const authOptions: NextAuthOptions = {
     }),
 
     GithubProvider({
-      clientId: process.env.GITHUB_ID ?? "",
-      clientSecret: process.env.GITHUB_SECRET ?? "",
+      clientId: process.env.GITHUB_ID ?? '',
+      clientSecret: process.env.GITHUB_SECRET ?? '',
     }),
   ],
 
   callbacks: {
-    async signIn({ user }: { user: User }) {
+    async signIn({ user, account }) {
       if (!user.email) return false;
 
       const incomingEmail = user.email.toLowerCase().trim();
@@ -60,14 +60,24 @@ export const authOptions: NextAuthOptions = {
 
       await prisma.user.upsert({
         where: { email: user.email },
-        update: isAdmin ? { role: "admin" } : {},
+        update: isAdmin ? { role: 'admin' } : {},
         create: {
           email: user.email,
-          role: isAdmin ? "admin" : "user",
+          role: isAdmin ? 'admin' : 'user',
         },
       });
 
-      return isAdmin ? "/admin" : true;
+      if (account?.provider === 'github') {
+        await fetch('http://localhost:3001/internal/notify-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: user.email,
+          }),
+        });
+      }
+
+      return isAdmin ? '/admin' : true;
     },
 
     async session({ session }: { session: Session }) {
@@ -77,7 +87,7 @@ export const authOptions: NextAuthOptions = {
         where: { email: session.user.email },
       });
 
-      session.user.role = dbUser?.role ?? "user";
+      session.user.role = dbUser?.role ?? 'user';
       return session;
     },
   },
